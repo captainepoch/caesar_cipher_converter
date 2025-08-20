@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <iostream>
 
 namespace ccc
@@ -54,19 +53,36 @@ namespace ccc
 
         char get_caesar_shifted_char(char c)
         {
-            if (c < 'a' || c > 'z')
+            bool is_upper_case = std::isupper(c);
+
+            if ((c < 'a' || c > 'z') && (c < 'A' || c > 'Z'))
             {
                 return c;
             }
 
-            int idx = c - 'a';
+            char diff_char = 'a';
+            if (is_upper_case)
+            {
+                diff_char = 'A';
+            }
+
+            int idx = c - diff_char;
             idx = (idx + m_config.get_shift_value()) % 26;
             if (idx < 0)
             {
                 idx += 26;
             }
 
-            return m_ascii_alphabet[idx];
+            char caesar_char;
+            if (is_upper_case)
+            {
+                caesar_char = m_ascii_alphabet_upper[idx];
+            }
+            else
+            {
+                caesar_char = m_ascii_alphabet_lower[idx];
+            }
+            return caesar_char;
         }
 
         std::string encode()
@@ -88,7 +104,11 @@ namespace ccc
 
     private:
         CCConfig m_config;
-        const unsigned char m_ascii_alphabet[26] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-                                                    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+        const unsigned char m_ascii_alphabet_lower[26] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+                                                          'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+                                                          's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+        const unsigned char m_ascii_alphabet_upper[26] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+                                                          'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+                                                          'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
     };
 }  // namespace ccc

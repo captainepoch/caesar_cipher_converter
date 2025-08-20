@@ -28,7 +28,6 @@ ccc::CCConfig parse_args(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    char *endptr = NULL;
     int shift = 0;
 
     for (;;)
@@ -87,15 +86,6 @@ ccc::CCConfig parse_args(int argc, char *argv[])
         std::cout << "Text cannot be empty" << std::endl;
         exit(EXIT_FAILURE);
     }
-
-    std::transform(
-        text.begin(),
-        text.end(),
-        text.begin(),
-        [](unsigned char c)
-        {
-            return std::tolower(c);
-        });
 
     std::cout << "text = \"" << text << "\"\n";
 
