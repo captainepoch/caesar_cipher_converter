@@ -21,11 +21,9 @@ namespace ccc
             , m_text{std::move(text)}
             , m_mode{mode} {};
 
-        // Not copyable
         CCConfig(const CCConfig&) = default;
         CCConfig& operator=(const CCConfig&) = delete;
 
-        // Not movable
         CCConfig(CCConfig&&) = delete;
         CCConfig& operator=(CCConfig&&) = delete;
 
@@ -114,7 +112,6 @@ namespace ccc
             }
             else
             {
-                // Método más robusto para el decode
                 idx = (idx - m_config.get_shift_value() + 26) % 26;
             }
 
