@@ -4,12 +4,20 @@
 
 namespace ccc
 {
+    enum CCConfigModeEnum
+    {
+        none,
+        encode,
+        decode
+    };
+
     class CCConfig
     {
     public:
-        explicit CCConfig(const int shift, std::string text)
+        explicit CCConfig(const int shift, const std::string text, const CCConfigModeEnum mode)
             : m_shift{shift}
-            , m_text{std::move(text)} {};
+            , m_text{std::move(text)}
+            , m_mode{mode} {};
 
         // Not copyable
         CCConfig(const CCConfig&) = default;
@@ -30,9 +38,15 @@ namespace ccc
             return m_text;
         }
 
+        const CCConfigModeEnum get_mode()
+        {
+            return m_mode;
+        }
+
     private:
         int m_shift;
         std::string m_text;
+        CCConfigModeEnum m_mode;
     };
 
     class CaesarCipher
@@ -51,41 +65,7 @@ namespace ccc
 
         virtual ~CaesarCipher() = default;
 
-        char get_caesar_shifted_char(char c)
-        {
-            bool is_upper_case = std::isupper(c);
-
-            if ((c < 'a' || c > 'z') && (c < 'A' || c > 'Z'))
-            {
-                return c;
-            }
-
-            char diff_char = 'a';
-            if (is_upper_case)
-            {
-                diff_char = 'A';
-            }
-
-            int idx = c - diff_char;
-            idx = (idx + m_config.get_shift_value()) % 26;
-            if (idx < 0)
-            {
-                idx += 26;
-            }
-
-            char caesar_char;
-            if (is_upper_case)
-            {
-                caesar_char = m_ascii_alphabet_upper[idx];
-            }
-            else
-            {
-                caesar_char = m_ascii_alphabet_lower[idx];
-            }
-            return caesar_char;
-        }
-
-        std::string encode()
+        std::string get_caesar_text()
         {
             std::string transformed_text;
             transformed_text.resize(m_config.get_text().size());
@@ -110,5 +90,43 @@ namespace ccc
         const unsigned char m_ascii_alphabet_upper[26] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
                                                           'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
                                                           'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+
+        char get_caesar_shifted_char(char c)
+        {
+            bool is_upper_case = std::isupper(c);
+            if ((c < 'a' || c > 'z') && (c < 'A' || c > 'Z'))
+            {
+                return c;
+            }
+
+            char diff_char = 'a';
+            if (is_upper_case)
+            {
+                diff_char = 'A';
+            }
+
+            int idx = c - diff_char;
+            if (m_config.get_mode() == encode)
+            {
+                idx = (idx + m_config.get_shift_value()) % 26;
+            }
+            else
+            {
+                // Método más robusto para el decode
+                idx = (idx - m_config.get_shift_value() + 26) % 26;
+            }
+
+            char caesar_char;
+            if (is_upper_case)
+            {
+                caesar_char = m_ascii_alphabet_upper[idx];
+            }
+            else
+            {
+                caesar_char = m_ascii_alphabet_lower[idx];
+            }
+
+            return caesar_char;
+        }
     };
 }  // namespace ccc

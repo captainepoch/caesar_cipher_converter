@@ -2,6 +2,7 @@
 #include <getopt.h>
 #include <unistd.h>
 #include <climits>
+#include <cstdlib>
 #include <iostream>
 
 void print_usage_msg();
@@ -12,9 +13,7 @@ int main(int argc, char *argv[])
     ccc::CCConfig config = parse_args(argc, argv);
 
     ccc::CaesarCipher caesar_cipher{config};
-    auto encoded_text = caesar_cipher.encode();
-
-    std::cout << "Encoded text: " << encoded_text << std::endl;
+    std::cout << caesar_cipher.get_caesar_text() << std::endl;
 
     return 0;
 }
@@ -23,16 +22,18 @@ ccc::CCConfig parse_args(int argc, char *argv[])
 {
     if (argc <= 1 || argv[0] == nullptr || argv[0][0] == '\0')
     {
-        std::cout << "Empty arguments \n" << std::endl;
+        std::cerr << "Empty arguments \n" << std::endl;
         print_usage_msg();
         exit(EXIT_FAILURE);
     }
 
-    int shift = 0;
+    int shift = -1;
+    ccc::CCConfigModeEnum mode = ccc::none;
 
-    for (;;)
+    int opt;
+    while ((opt = getopt(argc, argv, "s:m:h")) != -1)
     {
-        switch (getopt(argc, argv, "s:h"))
+        switch (opt)
         {
         case 's':
         {
@@ -47,7 +48,11 @@ ccc::CCConfig parse_args(int argc, char *argv[])
                     exit(EXIT_FAILURE);
                 }
 
-                std::cout << "Value for -s: " << shift << "\n";
+                if (shift > 26)
+                {
+                    std::cerr << "Shift value bigger than the size of the alphabet: '" << arg << "'\n";
+                    exit(EXIT_FAILURE);
+                }
             }
             catch (const std::invalid_argument &)
             {
@@ -58,17 +63,51 @@ ccc::CCConfig parse_args(int argc, char *argv[])
             continue;
         }
 
-        case '?':
-        case 'h':
-        default:
-            print_usage_msg();
-            exit(EXIT_SUCCESS);
+        case 'm':
+        {
+            try
+            {
+                switch (optarg[0])
+                {
+                case 'e':
+                    mode = ccc::encode;
+                    break;
+                case 'd':
+                    mode = ccc::decode;
+                    break;
+                default:
+                    std::cerr << "Invalid mode: '" << optarg << "'\n";
+                    exit(EXIT_FAILURE);
+                }
+            }
+            catch (const std::invalid_argument &)
+            {
+                std::cerr << "Invalid argument for -m: '" << optarg << "'\n";
+                exit(EXIT_FAILURE);
+            }
 
-        case -1:
-            break;
+            continue;
         }
 
-        break;
+        case 'h':
+        case '?':
+        default:
+        {
+            print_usage_msg();
+            exit(EXIT_SUCCESS);
+        }
+        }
+    }
+
+    if (shift == -1)
+    {
+        std::cerr << "Error: -s parameter is required\n";
+        exit(EXIT_FAILURE);
+    }
+    if (mode == ccc::none)
+    {
+        std::cerr << "Error: -m parameter is required\n";
+        exit(EXIT_FAILURE);
     }
 
     std::string text;
@@ -83,17 +122,17 @@ ccc::CCConfig parse_args(int argc, char *argv[])
 
     if (text.empty())
     {
-        std::cout << "Text cannot be empty" << std::endl;
+        std::cerr << "Text cannot be empty" << std::endl;
         exit(EXIT_FAILURE);
     }
 
-    std::cout << "text = \"" << text << "\"\n";
+    std::cout << "Original text = \"" << text << "\"\n";
 
-    return ccc::CCConfig{shift, text};
+    return ccc::CCConfig{shift, text, mode};
 }
 
 void print_usage_msg()
 {
     std::cout << "Usage:" << std::endl;
-    std::cout << "\tccc -s <shift value> <text to decode>" << std::endl;
+    std::cout << "\tccc -s <shift value> -m <encode (e) or decode (d)> <text to decode>" << std::endl;
 }
