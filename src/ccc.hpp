@@ -1,12 +1,15 @@
 #pragma once
 
+#include <iostream>
+
 namespace ccc
 {
     class CCConfig
     {
     public:
-        explicit CCConfig(const long m_shift)
-            : m_shift{m_shift} {};
+        explicit CCConfig(const int shift, std::string text)
+            : m_shift{shift}
+            , m_text{text} {};
 
         // Not copyable
         CCConfig(const CCConfig&) = delete;
@@ -19,7 +22,8 @@ namespace ccc
         virtual ~CCConfig() = default;
 
     private:
-        long m_shift;
+        int m_shift;
+        std::string m_text;
     };
 
     class CaesarCipher
