@@ -11,7 +11,11 @@ int main(int argc, char *argv[])
 {
     ccc::CCConfig config = parse_args(argc, argv);
 
-    ccc::CaesarCipher cc;
+    ccc::CaesarCipher caesar_cipher{config};
+    auto encoded_text = caesar_cipher.encode();
+
+    std::cout << "Encoded text: " << encoded_text << std::endl;
+
     return 0;
 }
 
@@ -78,13 +82,22 @@ ccc::CCConfig parse_args(int argc, char *argv[])
         text += argv[i];
     }
 
-    std::cout << "text = \"" << text << "\"\n";
-
     if (text.empty())
     {
         std::cout << "Text cannot be empty" << std::endl;
         exit(EXIT_FAILURE);
     }
+
+    std::transform(
+        text.begin(),
+        text.end(),
+        text.begin(),
+        [](unsigned char c)
+        {
+            return std::tolower(c);
+        });
+
+    std::cout << "text = \"" << text << "\"\n";
 
     return ccc::CCConfig{shift, text};
 }
