@@ -9,14 +9,41 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 
-add_compile_options(-Wall -Werror)
+set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/vendor/imgui)
 
-add_executable(ccc ${SOURCES})
-
-target_include_directories(ccc
-    PRIVATE
+set(IMGUI_SOURCES
+    ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
+    ${IMGUI_DIR}/imgui_demo.cpp
 )
 
-target_link_libraries(ccc
-    PRIVATE
+set(IMGUI_BACKENDS
+    ${IMGUI_DIR}/backends/imgui_impl_sdl2.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
 )
+
+add_executable(ccc
+    ${SOURCES}
+    ${IMGUI_SOURCES}
+    ${IMGUI_BACKENDS}
+)
+
+target_include_directories(ccc PRIVATE
+    ${IMGUI_DIR}
+    ${IMGUI_DIR}/backends
+    ${SDL2_INCLUDE_DIRS}
+)
+
+find_package(OpenGL REQUIRED)
+find_package(SDL2 REQUIRED)
+
+target_link_libraries(ccc PRIVATE
+    ${SDL2_LIBRARIES}
+    OpenGL::GL
+)
+
+if(APPLE)
+    target_link_libraries(ccc PRIVATE "-framework OpenGL")
+endif()
