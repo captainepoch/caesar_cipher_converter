@@ -1,8 +1,7 @@
-#include "ccc_utils.hpp"
-#include <iostream>
-#include <memory>
 #include "ccc.hpp"
+#include "ccc_utils.hpp"
 #include <getopt.h>
+#include <iostream>
 
 void print_usage_msg()
 {
