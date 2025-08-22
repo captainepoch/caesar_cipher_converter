@@ -26,8 +26,8 @@ namespace ccc
         CCConfig(const CCConfig&) = delete;
         CCConfig& operator=(const CCConfig&) = delete;
 
-        CCConfig(CCConfig&&) = default;
-        CCConfig& operator=(CCConfig&&) = default;
+        CCConfig(CCConfig&&) = delete;
+        CCConfig& operator=(CCConfig&&) = delete;
 
         virtual ~CCConfig() = default;
 
