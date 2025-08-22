@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <cctype>
 #include <iostream>
+#include <memory>
+#include <string>
 
 namespace ccc
 {
@@ -16,44 +18,43 @@ namespace ccc
     class CCConfig
     {
     public:
-        explicit CCConfig(const int shift, const std::string text, const CCConfigModeEnum mode)
+        explicit CCConfig(int shift, std::string text, CCConfigModeEnum mode)
             : m_shift{shift}
             , m_text{std::move(text)}
-            , m_mode{mode} {};
+            , m_mode{mode}
+        {
+        }
 
-        CCConfig(const CCConfig&) = default;
+        CCConfig(const CCConfig&) = delete;
         CCConfig& operator=(const CCConfig&) = delete;
 
-        CCConfig(CCConfig&&) = delete;
-        CCConfig& operator=(CCConfig&&) = delete;
+        CCConfig(CCConfig&&) = default;
+        CCConfig& operator=(CCConfig&&) = default;
 
         virtual ~CCConfig() = default;
 
-        const int get_shift_value()
+        int get_shift_value() const
         {
             return m_shift;
         }
-
         void set_shift_value(int shift)
         {
             m_shift = shift;
         }
 
-        const std::string& get_text()
+        const std::string& get_text() const
         {
             return m_text;
         }
-
         void set_text(std::string text)
         {
             m_text = std::move(text);
         }
 
-        const CCConfigModeEnum get_mode()
+        CCConfigModeEnum get_mode() const
         {
             return m_mode;
         }
-
         void set_mode(CCConfigModeEnum mode)
         {
             m_mode = mode;
@@ -69,19 +70,19 @@ namespace ccc
     {
     public:
         explicit CaesarCipher(CCConfig* config)
-            : m_config{config} {};
+            : m_config{config}
+        {
+        }
 
-        // Not copyable
         CaesarCipher(const CaesarCipher&) = delete;
         CaesarCipher& operator=(const CaesarCipher&) = delete;
 
-        // Not movable
         CaesarCipher(CaesarCipher&&) = delete;
         CaesarCipher& operator=(CaesarCipher&&) = delete;
 
         virtual ~CaesarCipher() = default;
 
-        std::string get_caesar_text()
+        std::string get_caesar_text() const
         {
             std::string transformed_text;
             transformed_text.resize(m_config->get_text().size());
@@ -107,41 +108,28 @@ namespace ccc
                                                           'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
                                                           'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 
-        char get_caesar_shifted_char(char c)
+        char get_caesar_shifted_char(unsigned char c) const
         {
-            bool is_upper_case = std::isupper(c);
-            if ((c < 'a' || c > 'z') && (c < 'A' || c > 'Z'))
+            if (!std::isalpha(c))
             {
                 return c;
             }
 
-            char diff_char = 'a';
-            if (is_upper_case)
-            {
-                diff_char = 'A';
-            }
-
-            int idx = c - diff_char;
+            bool is_upper_case = std::isupper(c);
+            unsigned char base = is_upper_case ? 'A' : 'a';
+            int idx = static_cast<int>(c - base);
+            int shift = m_config->get_shift_value() % 26;
             if (m_config->get_mode() == encode)
             {
-                idx = (idx + m_config->get_shift_value()) % 26;
+                idx = (idx + shift + 26) % 26;
             }
             else
             {
-                idx = (idx - m_config->get_shift_value() + 26) % 26;
+                idx = (idx - shift + 26) % 26;
             }
 
-            char caesar_char;
-            if (is_upper_case)
-            {
-                caesar_char = m_ascii_alphabet_upper[idx];
-            }
-            else
-            {
-                caesar_char = m_ascii_alphabet_lower[idx];
-            }
-
-            return caesar_char;
+            return is_upper_case ? static_cast<char>(m_ascii_alphabet_upper[idx])
+                                 : static_cast<char>(m_ascii_alphabet_lower[idx]);
         }
     };
 }  // namespace ccc
