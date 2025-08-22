@@ -27,10 +27,8 @@ int main(int argc, char *argv[])
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
-    const int window_size = 720;
-
-    SDL_Window *window = SDL_CreateWindow(
-        "Caesar Cipher", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_size, window_size, SDL_WINDOW_OPENGL);
+    SDL_Window *window =
+        SDL_CreateWindow("Caesar Cipher", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 720, 220, SDL_WINDOW_OPENGL);
     SDL_GLContext gl_context = SDL_GL_CreateContext(window);
     SDL_GL_MakeCurrent(window, gl_context);
     // Enable VSync
@@ -45,9 +43,11 @@ int main(int argc, char *argv[])
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 150");
 
-    // InputTextMultiline variables
+    // Encoded/Decoded text
     std::string unencoded_text = "";
     std::string encoded_text = "";
+    // Shift value
+    int shift = 0;
     // Encode/Decode mode
     bool is_decode = false;
     // Encode/Decode button
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
         ImGui::NewFrame();
 
         ImGui::SetNextWindowPos(ImVec2(0, 0));
-        ImGui::SetNextWindowSize(ImVec2(window_size, window_size));
+        ImGui::SetNextWindowSize(io.DisplaySize);
 
         ImGui::Begin(
             "##caesar_input",
@@ -102,6 +102,8 @@ int main(int argc, char *argv[])
             InputTextCallback,
             (void *)&unencoded_text);
 
+        ImGui::Spacing();
+
         ImGui::Text("Encoded text");
         ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
         ImGui::InputTextMultiline(
@@ -113,8 +115,15 @@ int main(int argc, char *argv[])
             InputTextCallback,
             (void *)&encoded_text);
 
+        ImGui::Spacing();
+
+        ImGui::DragInt("Caesar Shift", &shift, 1.0f, 0, 25, "Shift: %d");
+
+        ImGui::SameLine();
+
         ImGui::Checkbox("Decode", &is_decode);
         ImGui::SameLine();
+
         if (ImGui::Button("Execute"))
         {
             has_clicked = !has_clicked;
