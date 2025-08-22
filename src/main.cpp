@@ -43,16 +43,6 @@ int main(int argc, char *argv[])
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 150");
 
-    // Encoded/Decoded text
-    std::string unencoded_text = "";
-    std::string encoded_text = "";
-    // Shift value
-    int shift = 0;
-    // Encode/Decode mode
-    bool is_decode = false;
-    // Encode/Decode button
-    bool has_clicked = false;
-
     // Callback to resize the text buffer automatically
     auto InputTextCallback = [](ImGuiInputTextCallbackData *data) -> int
     {
@@ -64,6 +54,20 @@ int main(int argc, char *argv[])
         }
         return 0;
     };
+
+    // Encoded/Decoded text
+    std::string unencoded_text = "";
+    std::string encoded_text = "";
+    // Shift value
+    int shift = 0;
+    // Encode/Decode mode
+    bool is_encode = true;
+    // Encode/Decode button
+    bool has_clicked = false;
+
+    // Caesar Cipher Config
+    ccc::CCConfig config{shift, unencoded_text, ccc::encode};
+    ccc::CaesarCipher caesar_cipher{&config};
 
     bool done = false;
     while (!done)
@@ -91,7 +95,7 @@ int main(int argc, char *argv[])
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                 ImGuiWindowFlags_NoCollapse);
 
-        ImGui::BeginDisabled(is_decode);
+        ImGui::BeginDisabled(!is_encode);
 
         ImGui::Text("Unencoded text");
         ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
@@ -102,13 +106,13 @@ int main(int argc, char *argv[])
             ImVec2(-1.0f, ImGui::GetTextLineHeight() * 5),
             ImGuiInputTextFlags_CallbackResize,
             InputTextCallback,
-            (void *)&unencoded_text);
+            &unencoded_text);
 
         ImGui::EndDisabled();
 
         ImGui::Spacing();
 
-        ImGui::BeginDisabled(!is_decode);
+        ImGui::BeginDisabled(is_encode);
 
         ImGui::Text("Encoded text");
         ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
@@ -119,27 +123,42 @@ int main(int argc, char *argv[])
             ImVec2(-1.0f, ImGui::GetTextLineHeight() * 5),
             ImGuiInputTextFlags_CallbackResize,
             InputTextCallback,
-            (void *)&encoded_text);
+            &encoded_text);
 
         ImGui::EndDisabled();
 
         ImGui::Spacing();
 
-        ImGui::DragInt("Caesar Shift", &shift, 1.0f, 0, 25, "Shift: %d");
+        if (ImGui::DragInt("Caesar Shift", &shift, 1.0f, 0, 25, "Shift: %d"))
+        {
+            config.set_shift_value(shift);
+        }
 
         ImGui::SameLine();
 
-        ImGui::Checkbox("Decode", &is_decode);
+        ImGui::Checkbox("Encode", &is_encode);
+        if (is_encode)
+        {
+            config.set_mode(ccc::decode);
+        }
+        else
+        {
+            config.set_mode(ccc::encode);
+        }
         ImGui::SameLine();
 
         if (ImGui::Button("Execute"))
         {
-            has_clicked = !has_clicked;
-        }
-        if (has_clicked)
-        {
-            ImGui::SameLine();
-            ImGui::Text("Thanks for clicking me!");
+            if (is_encode)
+            {
+                config.set_text(unencoded_text);
+                encoded_text = caesar_cipher.get_caesar_text();
+            }
+            else
+            {
+                config.set_text(encoded_text);
+                unencoded_text = caesar_cipher.get_caesar_text();
+            }
         }
 
         ImGui::End();
