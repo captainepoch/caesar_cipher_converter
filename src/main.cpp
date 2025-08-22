@@ -4,6 +4,7 @@
 #include <iostream>
 #include <getopt.h>
 #include <unistd.h>
+#include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_opengl3.h"
 #include <SDL.h>
@@ -44,8 +45,13 @@ int main(int argc, char *argv[])
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 150");
 
+    // InputTextMultiline variables
     std::string unencoded_text = "";
     std::string encoded_text = "";
+    // Encode/Decode mode
+    bool is_decode = false;
+    // Encode/Decode button
+    bool has_clicked = false;
 
     // Callback to resize the text buffer automatically
     auto InputTextCallback = [](ImGuiInputTextCallbackData *data) -> int
@@ -107,9 +113,22 @@ int main(int argc, char *argv[])
             InputTextCallback,
             (void *)&encoded_text);
 
+        ImGui::Checkbox("Decode", &is_decode);
+        ImGui::SameLine();
+        if (ImGui::Button("Execute"))
+        {
+            has_clicked = !has_clicked;
+        }
+        if (has_clicked)
+        {
+            ImGui::SameLine();
+            ImGui::Text("Thanks for clicking me!");
+        }
+
         ImGui::End();
 
         ImGui::Render();
+
         glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
