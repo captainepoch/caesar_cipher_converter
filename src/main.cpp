@@ -1,12 +1,13 @@
 #include "ccc.hpp"
-#include "ccc_utils.h"
+#include "ccc_utils.hpp"
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_opengl3.h"
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <memory>
 
-int main(int argc, char *argv[])
+int execute_gui()
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
@@ -174,10 +175,22 @@ int main(int argc, char *argv[])
     SDL_Quit();
 
     return 0;
-    /*ccc::CCConfig config = parse_args(argc, argv);
+}
 
-    ccc::CaesarCipher caesar_cipher{config};
-    std::cout << caesar_cipher.get_caesar_text() << std::endl;
+int main(int argc, char *argv[])
+{
+    bool is_gui_mode = false;
+    ccc::CCConfig config = parse_args(argc, argv, &is_gui_mode);
 
-    return 0;*/
+    if (is_gui_mode)
+    {
+        return execute_gui();
+    }
+    else
+    {
+        ccc::CaesarCipher caesar_cipher{&config};
+        std::cout << caesar_cipher.get_caesar_text() << std::endl;
+    }
+
+    return 0;
 }
