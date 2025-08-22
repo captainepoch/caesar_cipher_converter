@@ -33,14 +33,30 @@ namespace ccc
         {
             return m_shift;
         }
+
+        void set_shift_value(int shift)
+        {
+            m_shift = shift;
+        }
+
         const std::string& get_text()
         {
             return m_text;
         }
 
+        void set_text(std::string text)
+        {
+            m_text = std::move(text);
+        }
+
         const CCConfigModeEnum get_mode()
         {
             return m_mode;
+        }
+
+        void set_mode(CCConfigModeEnum mode)
+        {
+            m_mode = mode;
         }
 
     private:
@@ -52,7 +68,7 @@ namespace ccc
     class CaesarCipher
     {
     public:
-        explicit CaesarCipher(const CCConfig config)
+        explicit CaesarCipher(CCConfig* config)
             : m_config{config} {};
 
         // Not copyable
@@ -68,11 +84,11 @@ namespace ccc
         std::string get_caesar_text()
         {
             std::string transformed_text;
-            transformed_text.resize(m_config.get_text().size());
+            transformed_text.resize(m_config->get_text().size());
 
             std::transform(
-                m_config.get_text().begin(),
-                m_config.get_text().end(),
+                m_config->get_text().begin(),
+                m_config->get_text().end(),
                 transformed_text.begin(),
                 [this](unsigned char c)
                 {
@@ -83,7 +99,7 @@ namespace ccc
         }
 
     private:
-        CCConfig m_config;
+        CCConfig* m_config;
         const unsigned char m_ascii_alphabet_lower[26] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
                                                           'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
                                                           's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
@@ -106,13 +122,13 @@ namespace ccc
             }
 
             int idx = c - diff_char;
-            if (m_config.get_mode() == encode)
+            if (m_config->get_mode() == encode)
             {
-                idx = (idx + m_config.get_shift_value()) % 26;
+                idx = (idx + m_config->get_shift_value()) % 26;
             }
             else
             {
-                idx = (idx - m_config.get_shift_value() + 26) % 26;
+                idx = (idx - m_config->get_shift_value() + 26) % 26;
             }
 
             char caesar_char;
