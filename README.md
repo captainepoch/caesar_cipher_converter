@@ -17,8 +17,9 @@ The binary output is `ccc`.
 
 ```sh
 ccc
-	-s  shift value not greater than 26
-	-m  encode (e) or decode (d)
+	-s  shift value not greater than 26 (not mandatory with -g)
+	-m  encode (e) or decode (d) (not mandatory with -g)
+	-g  GUI only
 	-h  shows the usage message
 ```
 
@@ -42,6 +43,10 @@ Original text = "nMyno Mkockb"
 dCode Caesar
 ```
 
+GUI mode with [ImgUi][imgui]:
+
+![](./repo_doc/ccc_gui_mode.png)
+
 # LICENSE
 
 [Modified BSD License][license].
@@ -49,4 +54,5 @@ dCode Caesar
 You can find a copy of this license at [this static file][adolpw_license]
 
 [adolpw_license]: https://adol.pw/licenses/modified_bsd_license.txt
+[imgui]: https://github.com/ocornut/imgui
 [license]: COPYING
