@@ -91,6 +91,8 @@ int main(int argc, char *argv[])
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                 ImGuiWindowFlags_NoCollapse);
 
+        ImGui::BeginDisabled(is_decode);
+
         ImGui::Text("Unencoded text");
         ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
         ImGui::InputTextMultiline(
@@ -102,7 +104,11 @@ int main(int argc, char *argv[])
             InputTextCallback,
             (void *)&unencoded_text);
 
+        ImGui::EndDisabled();
+
         ImGui::Spacing();
+
+        ImGui::BeginDisabled(!is_decode);
 
         ImGui::Text("Encoded text");
         ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
@@ -114,6 +120,8 @@ int main(int argc, char *argv[])
             ImGuiInputTextFlags_CallbackResize,
             InputTextCallback,
             (void *)&encoded_text);
+
+        ImGui::EndDisabled();
 
         ImGui::Spacing();
 
