@@ -110,24 +110,20 @@ namespace ccc
         {
             if (!std::isalpha(c))
             {
-                return c;
+                return static_cast<char>(c);
             }
 
-            bool is_upper_case = std::isupper(c);
-            unsigned char base = is_upper_case ? 'A' : 'a';
-            int idx = static_cast<int>(c - base);
+            const bool is_upper_case = std::isupper(c);
+            const auto& alphabet = is_upper_case ? m_ascii_alphabet_upper : m_ascii_alphabet_lower;
+            const int idx = c - (is_upper_case ? 'A' : 'a');
+
             int shift = m_config->get_shift_value() % 26;
-            if (m_config->get_mode() == encode)
+            if (m_config->get_mode() == decode)
             {
-                idx = (idx + shift + 26) % 26;
-            }
-            else
-            {
-                idx = (idx - shift + 26) % 26;
+                shift = -shift;
             }
 
-            return is_upper_case ? static_cast<char>(m_ascii_alphabet_upper[idx])
-                                 : static_cast<char>(m_ascii_alphabet_lower[idx]);
+            return alphabet[(idx + shift + 26) % 26];
         }
     };
 }  // namespace ccc
