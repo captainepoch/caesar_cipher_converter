@@ -1,5 +1,7 @@
 #include "ccc.hpp"
+
 #include "ccc_utils.hpp"
+
 #include <getopt.h>
 #include <iostream>
 
@@ -11,7 +13,7 @@ void print_usage_msg()
     std::cout << "\tccc -g" << std::endl;
 }
 
-ccc::CCConfig parse_args(int argc, char *argv[], bool *is_gui_mode)
+ccc::CCConfig parse_args(int argc, char* argv[], bool* is_gui_mode)
 {
     if (argc <= 1 || argv[0] == nullptr || argv[0][0] == '\0')
     {
@@ -52,7 +54,7 @@ ccc::CCConfig parse_args(int argc, char *argv[], bool *is_gui_mode)
                     exit(EXIT_FAILURE);
                 }
             }
-            catch (const std::invalid_argument &)
+            catch (const std::invalid_argument&)
             {
                 std::cerr << "Error: Invalid argument for -s: '" << optarg << "'\n";
                 exit(EXIT_FAILURE);
@@ -78,7 +80,7 @@ ccc::CCConfig parse_args(int argc, char *argv[], bool *is_gui_mode)
                     exit(EXIT_FAILURE);
                 }
             }
-            catch (const std::invalid_argument &)
+            catch (const std::invalid_argument&)
             {
                 std::cerr << "Error: Invalid argument for -m: '" << optarg << "'\n";
                 exit(EXIT_FAILURE);

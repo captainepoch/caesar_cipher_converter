@@ -1,10 +1,11 @@
 #include "ccc.hpp"
+
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_opengl3.h"
+
 #include <SDL.h>
 #include <SDL_opengl.h>
-#include <iostream>
 
 int execute_gui()
 {
@@ -20,7 +21,7 @@ int execute_gui()
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
-    SDL_Window *window =
+    SDL_Window* window =
         SDL_CreateWindow("Caesar Cipher", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 720, 220, SDL_WINDOW_OPENGL);
     SDL_GLContext gl_context = SDL_GL_CreateContext(window);
     SDL_GL_MakeCurrent(window, gl_context);
@@ -29,28 +30,27 @@ int execute_gui()
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-    (void)io;
+    ImGuiIO& io = ImGui::GetIO();
     ImGui::StyleColorsDark();
 
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 150");
 
     // Callback to resize the text buffer automatically
-    auto InputTextCallback = [](ImGuiInputTextCallbackData *data) -> int
+    auto InputTextCallback = [](ImGuiInputTextCallbackData* data) -> int
     {
         if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
         {
-            std::string *str = (std::string *)data->UserData;
+            std::string* str = (std::string*)data->UserData;
             str->resize(data->BufTextLen);
-            data->Buf = (char *)str->c_str();
+            data->Buf = (char*)str->c_str();
         }
         return 0;
     };
 
     // Encoded/Decoded text
-    std::string unencoded_text = "";
-    std::string encoded_text = "";
+    std::string unencoded_text{};
+    std::string encoded_text{};
     // Shift value
     int shift = 0;
     // Encode/Decode mode
@@ -94,7 +94,7 @@ int execute_gui()
         ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
         ImGui::InputTextMultiline(
             "##unencoded",
-            (char *)unencoded_text.c_str(),
+            (char*)unencoded_text.c_str(),
             unencoded_text.capacity() + 1,
             ImVec2(-1.0f, ImGui::GetTextLineHeight() * 5),
             ImGuiInputTextFlags_CallbackResize,
@@ -111,7 +111,7 @@ int execute_gui()
         ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
         ImGui::InputTextMultiline(
             "##encoded",
-            (char *)encoded_text.c_str(),
+            (char*)encoded_text.c_str(),
             encoded_text.capacity() + 1,
             ImVec2(-1.0f, ImGui::GetTextLineHeight() * 5),
             ImGuiInputTextFlags_CallbackResize,

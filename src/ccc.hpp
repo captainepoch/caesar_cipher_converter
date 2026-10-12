@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <cctype>
-#include <iostream>
+#include <string>
 
 namespace ccc
 {
@@ -16,9 +16,9 @@ namespace ccc
     class CCConfig
     {
     public:
-        explicit CCConfig(int shift, std::string text, CCConfigModeEnum mode)
+        explicit CCConfig(const int& shift, const std::string& text, const CCConfigModeEnum& mode)
             : m_shift{shift}
-            , m_text{std::move(text)}
+            , m_text{text}
             , m_mode{mode}
         {
         }
